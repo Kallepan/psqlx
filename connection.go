@@ -145,8 +145,7 @@ func (c *Connection) handshake(ctx context.Context) error {
 func (c *Connection) writeQuery(ctx context.Context, query string) error {
 	var b Buffer
 
-	b.WriteByte(msgQuery)
-	b.WriteInt32(0)
+	b.WriteBytes([]byte{msgQuery, 0, 0, 0, 0})
 	b.WriteString(query)
 	b.CalculateSize(1)
 
@@ -229,8 +228,7 @@ func (c *Connection) authSASL(ctx context.Context, reader *Reader) error {
 
 		var b Buffer
 
-		b.WriteByte(msgSASLResponse)
-		b.WriteInt32(0)
+		b.WriteBytes([]byte{msgSASLResponse, 0, 0, 0, 0})
 		b.WriteBytes(resp)
 		b.CalculateSize(1)
 

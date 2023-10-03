@@ -4,9 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"database/sql/driver"
-	"errors"
-	"regexp"
-	"strconv"
 )
 
 const driverName = "psqlx"
@@ -33,33 +30,8 @@ func (d *Driver) Open(name string) (driver.Conn, error) {
 }
 
 func (d *Driver) OpenConnector(name string) (driver.Connector, error) {
-	cfg, err := d.parse(name)
-	if err != nil {
-		return nil, err
-	}
+	cfg := &Config{}
+	cfg.LoadFromStr(name)
 
 	return NewConnector(cfg), nil
-}
-
-var rx = regexp.MustCompile(`postgres:\/\/(.*):(.*)@(.*):(\d+)\/(.*)\?sslmode=disable`)
-
-func (d *Driver) parse(dsn string) (*Config, error) {
-	sub := rx.FindStringSubmatch(dsn)
-	if len(sub) != 6 {
-		return nil, errors.New("invalid connection string")
-	}
-
-	port, err := strconv.Atoi(sub[4])
-	if err != nil {
-		return nil, errors.New("invalid port value")
-	}
-
-	return &Config{
-		Network:  "tcp",
-		Host:     sub[3],
-		Port:     port,
-		Username: sub[1],
-		Password: sub[2],
-		Database: sub[5],
-	}, nil
 }

@@ -39,6 +39,8 @@ func (b *Buffer) CalculateSize(prefix int) {
 
 	binary.BigEndian.PutUint32(data[prefix:], uint32(l-prefix))
 
+	// flush buffer
+	b.data = nil
 	b.data = data
 }
 
